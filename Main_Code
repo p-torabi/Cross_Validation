@@ -3,3 +3,50 @@ import numpy as np
 import sklearn.linear_model as skl_lm
 import matplotlib.pyplot as plt
 
+df1 = pd.read_csv('name_of_file.csv', na_values = '?').dropna()
+  #panda module loads and reads the csv file 
+  #dropna() will delete any null values from the dataframe
+df1.info()
+
+
+train_df = df1.sample(196, random_state=1)
+  #save in training data 196 random samples from the original dataframe
+
+test_df = df1[~df1.isin(train_df)].dropna(how = 'all')
+  #whatever data is not in the training, save in the testing data
+
+X_train = train_df['horsepower'].values.reshape(-1,1)
+  #take any data that is labelled as horsepower and take the values and reshape as a column vector
+y_train = train_df['mpg']
+  #why is there no reshaping?
+  #save all data labelled as mpg to the y training data, assuming alreadya column vector
+
+X_test = test_df['horsepower'].values.reshape(-1,1)
+y_test = test_df['mpg']
+
+  #use the training dataset to fit a lienar regression 
+
+lm = skl_lm.LinearRegression()
+crossvalidation = KFold(n_splits = 392, random_state=None, shuffle=False)
+  #split the data into individual vectors for each value 
+  #random_state object makes the values different every time the code is ran (when set to none or not given a seed)
+  #shuffle = False prevent the data from being rearraged 
+
+for i in range(1,6):
+  poly = PolynomialFeatures(degree=i)
+    #change the degree of the polynomial regression with every loop up to 6 degrees
+  X_current = poly.fit_transform(X)
+    #change the number of x parameters based on the degree of the poly
+  model = lm.fit(X_current, y)
+    #fit the polynomial regression to the data
+  dic_scores = {}
+  scores = cross_val_score(model, X_current, y, scoring ="neg_mean_squared_error", cv = crossvalidation, n_jobs = 1)
+  dic_scores[poly] = scores 
+    #??
+
+lowest_error = min(dic_scores.values())
+
+
+
+
+ 

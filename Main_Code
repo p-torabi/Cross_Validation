@@ -32,6 +32,11 @@ crossvalidation = KFold(n_splits = 392, random_state=None, shuffle=False)
   #random_state object makes the values different every time the code is ran (when set to none or not given a seed)
   #shuffle = False prevent the data from being rearraged 
 
+lowest_error = 0 
+current_degree = 0 
+#initial both variables
+
+# this finds the lowest error
 for i in range(1,6):
   poly = PolynomialFeatures(degree=i)
     #change the degree of the polynomial regression with every loop up to 6 degrees
@@ -41,10 +46,22 @@ for i in range(1,6):
     #fit the polynomial regression to the data
   dic_scores = {}
   scores = cross_val_score(model, X_current, y, scoring ="neg_mean_squared_error", cv = crossvalidation, n_jobs = 1)
+  #if scores < lowest_error:
+    #lowest error = scores 
+    #current_degree = i 
   dic_scores[poly] = scores 
     #??
 
-lowest_error = min(dic_scores.values())
+lowest_error = dic_scores_key(min(dic_scores.values()))
+poly = PolynomialFeatures(degree=lowest_error)
+X_current = poly.fit_transform(X)
+model = lm.fit(X_current, y)
+
+pred = model.predict(X_test)
+from sklearn.metric import mean_squared_error 
+MSE = mean_squared_error(y_test, pred)
+print(MSE)
+
 
 
 
